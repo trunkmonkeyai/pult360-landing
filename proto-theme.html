@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="ru" data-mode="dark">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Тема «Графит» — прототип</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+<style>
+/* ═══ Прототип темы «Графит» (серо-лаймовая, стеклянные плитки). Только для согласования — в программу не входит. ═══ */
+:root{
+  --lime:#c6f24e; --lime-ink:#0b0f0a;
+  --bg:#141615; --bg2:#1b1e1c;
+  --glass:rgba(255,255,255,.055); --glass-2:rgba(255,255,255,.085); --glass-hi:rgba(255,255,255,.10);
+  --line:rgba(255,255,255,.07); --border:rgba(255,255,255,.12);
+  --text:#eceeea; --muted:#9aa19b; --faint:#6e746f;
+  --acc:#c6f24e; --acc-t:rgba(198,242,78,.12); --acc-text:#d4f77a;
+  --pos:#9be15d; --neg:#ff8a7a; --warn:#f0b35a;
+  --blob1:rgba(198,242,78,.10); --blob2:rgba(170,176,172,.16); --blob3:rgba(130,138,133,.16);
+  --shadow:0 10px 30px rgba(0,0,0,.28);
+  --zebra:rgba(255,255,255,.025);
+}
+html[data-mode="light"]{
+  --bg:#e4e6e3; --bg2:#d9dcd8;
+  --glass:rgba(255,255,255,.52); --glass-2:rgba(255,255,255,.68); --glass-hi:rgba(255,255,255,.9);
+  --line:rgba(20,24,21,.07); --border:rgba(20,24,21,.12);
+  --text:#161917; --muted:#5d645f; --faint:#8a918b;
+  --acc:#7fae14; --acc-t:rgba(127,174,20,.14); --acc-text:#5d8608;
+  --pos:#4c8f1a; --neg:#c8452f; --warn:#b9771c;
+  --blob1:rgba(198,242,78,.45); --blob2:rgba(255,255,255,.75); --blob3:rgba(160,175,150,.45);
+  --shadow:0 10px 30px rgba(40,50,40,.12);
+  --zebra:rgba(20,24,21,.03);
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--text);font:14px/1.45 "Onest",system-ui,sans-serif;-webkit-font-smoothing:antialiased;transition:background .4s,color .4s}
+.mono{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:11.5px;letter-spacing:.02em;text-transform:lowercase}
+
+/* фон: мягкие пятна — стеклу нужно что размывать */
+.bg{position:fixed;inset:0;z-index:-1;overflow:hidden;background:radial-gradient(120% 80% at 50% 0%,var(--bg2),var(--bg))}
+.bg i{position:absolute;border-radius:50%;filter:blur(70px);opacity:1;animation:drift 28s ease-in-out infinite alternate}
+.bg i:nth-child(1){width:46vw;height:46vw;left:48%;top:-12%;background:var(--blob1)}
+.bg i:nth-child(2){width:40vw;height:40vw;left:-10%;top:40%;background:var(--blob2);animation-duration:34s}
+.bg i:nth-child(3){width:34vw;height:34vw;left:62%;top:58%;background:var(--blob3);animation-duration:40s}
+.bg svg{position:absolute;inset:0;width:100%;height:100%;opacity:.5}
+.bg path{fill:none;stroke:var(--acc);stroke-width:1;opacity:.18}
+@keyframes drift{to{transform:translate(-6vw,5vh) scale(1.08)}}
+body.still .bg i{animation:none}
+
+/* стекло — общая деталь */
+.glass{background:linear-gradient(180deg,var(--glass-2),var(--glass));border:1px solid var(--border);border-radius:18px;
+  -webkit-backdrop-filter:blur(18px) saturate(140%);backdrop-filter:blur(18px) saturate(140%);
+  box-shadow:inset 0 1px 0 var(--glass-hi),var(--shadow)}
+
+/* раскладка */
+.app{display:grid;grid-template-columns:248px 1fr;gap:16px;padding:16px;min-height:100vh}
+nav{position:sticky;top:16px;height:calc(100vh - 32px);display:flex;flex-direction:column;padding:16px 12px;border-radius:22px}
+.brand{display:flex;align-items:center;gap:12px;padding:4px 8px 18px}
+.brand svg{width:36px;height:36px}
+.brand b{display:block;font-size:17px;font-weight:600;letter-spacing:-.01em}
+.brand span{font-size:12px;color:var(--muted)}
+.menu{display:flex;flex-direction:column;gap:2px}
+.menu a{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:12px;color:var(--muted);text-decoration:none;font-weight:500;cursor:pointer;transition:background .2s,color .2s}
+.menu a:hover{background:var(--glass-2);color:var(--text)}
+.menu a.on{background:var(--acc);color:var(--lime-ink);box-shadow:0 0 22px rgba(198,242,78,.28)}
+html[data-mode="light"] .menu a.on{background:#c6f24e}
+.menu a .d{width:8px;height:8px;border-radius:99px;background:currentColor;opacity:.7}
+.menu a .n{margin-left:auto;font:600 11px/1 "JetBrains Mono",monospace;padding:3px 7px;border-radius:99px;background:var(--acc-t);color:var(--acc-text)}
+.menu a.on .n{background:rgba(11,15,10,.14);color:var(--lime-ink)}
+.menu a.off{opacity:.4;cursor:default}
+.foot{margin-top:auto;display:grid;gap:8px}
+.seg{display:grid;grid-template-columns:1fr 1fr;padding:3px;border-radius:12px;background:var(--glass);border:1px solid var(--line)}
+.seg button{border:0;background:none;color:var(--muted);font:500 12.5px "Onest",sans-serif;padding:7px 6px;border-radius:9px;cursor:pointer}
+.seg button.on{background:var(--glass-hi);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;height:36px;border-radius:12px;border:1px solid var(--border);background:transparent;color:var(--text);font:500 13px "Onest",sans-serif;cursor:pointer}
+.btn:hover{border-color:var(--acc);background:var(--acc-t)}
+.who{font-size:12px;color:var(--muted);padding:0 4px}
+
+main{min-width:0;display:flex;flex-direction:column;gap:16px}
+.top{display:flex;align-items:center;gap:12px;padding:10px 12px 10px 20px;border-radius:999px}
+.top h1{margin:0;font-size:18px;font-weight:600;letter-spacing:-.01em}
+.top .sp{flex:1}
+.per{display:flex;align-items:center;gap:4px;padding:3px;border-radius:999px;background:var(--glass);border:1px solid var(--line)}
+.per button{border:0;background:none;color:var(--muted);font:500 12.5px "Onest",sans-serif;padding:6px 12px;border-radius:99px;cursor:pointer}
+.per button.on{background:var(--acc);color:var(--lime-ink)}
+html[data-mode="light"] .per button.on{background:#c6f24e}
+.search{display:flex;align-items:center;gap:8px;height:36px;padding:0 14px;border-radius:99px;border:1px solid var(--border);color:var(--muted);font-size:13px;min-width:220px}
+.search kbd{margin-left:auto;font:11px "JetBrains Mono",monospace;padding:2px 6px;border-radius:6px;border:1px solid var(--border)}
+
+.hello{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;padding:6px 6px 0}
+.hello h2{margin:4px 0 0;font-size:30px;font-weight:600;letter-spacing:-.025em}
+.hello .badge{display:inline-flex;align-items:center;gap:8px;padding:5px 11px;border-radius:99px;border:1px solid var(--border);background:var(--glass);color:var(--muted)}
+.dot{width:7px;height:7px;border-radius:99px;background:var(--acc);box-shadow:0 0 10px rgba(198,242,78,.7);animation:blink 1.6s ease-in-out infinite}
+@keyframes blink{50%{opacity:.35}}
+
+/* плитки KPI: подпись — моно, значение крупно, график динамики справа от значения */
+.kpis{display:grid;grid-template-columns:1.25fr 1fr 1fr 1fr;gap:16px}
+.kpi{position:relative;padding:18px 20px;cursor:pointer;transition:transform .35s cubic-bezier(.16,1,.3,1),border-color .25s;overflow:hidden}
+.kpi:hover{transform:translateY(-2px);border-color:rgba(198,242,78,.4)}
+.kpi::before{content:"";position:absolute;inset:0;pointer-events:none;border-radius:inherit;opacity:0;transition:opacity .3s;
+  background:radial-gradient(240px circle at var(--mx,50%) var(--my,0%),rgba(255,255,255,.10),transparent 60%)}
+.kpi:hover::before{opacity:1}
+.kpi .l{color:var(--muted)}
+.kpi .row{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;margin-top:10px}
+.kpi .v{font-size:30px;font-weight:600;letter-spacing:-.03em;line-height:1;font-variant-numeric:tabular-nums;white-space:nowrap}
+.kpi .v small{font-size:15px;font-weight:500;color:var(--muted);margin-left:4px}
+.kpi .s{margin-top:10px;font-size:12.5px;color:var(--muted);display:flex;gap:8px;align-items:center}
+.up{color:var(--pos);font-weight:600}.down{color:var(--neg);font-weight:600}
+.spark{width:96px;height:34px;flex:none}
+.spark path.a{fill:none;stroke:var(--acc);stroke-width:2;stroke-linecap:round}
+.spark path.f{fill:url(#sg);opacity:.9}
+.bar{height:6px;border-radius:99px;background:var(--line);overflow:hidden;margin-top:12px}
+.bar i{display:block;height:100%;border-radius:99px;background:var(--acc)}
+/* главная плитка — лаймовое стекло */
+.kpi.hero{background:linear-gradient(160deg,rgba(214,250,110,.95),rgba(186,232,64,.88));border-color:rgba(230,255,160,.8);color:var(--lime-ink);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.55),0 14px 40px rgba(198,242,78,.22)}
+.kpi.hero .l,.kpi.hero .s,.kpi.hero .v small{color:rgba(11,15,10,.68)}
+.kpi.hero .up{color:#24400a}
+.kpi.hero .spark path.a{stroke:var(--lime-ink)}
+.kpi.hero .spark path.f{fill:rgba(11,15,10,.10)}
+.kpi.hero .bar{background:rgba(11,15,10,.15)}.kpi.hero .bar i{background:var(--lime-ink)}
+
+.grid2{display:grid;grid-template-columns:1fr 1.5fr;gap:16px;align-items:start}
+.panel{padding:16px 18px}
+.ph{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:10px}
+.ph h3{margin:0;font-size:15.5px;font-weight:600}
+.ph span{color:var(--muted)}
+.att{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.att li{display:flex;gap:12px;align-items:flex-start;padding:10px 12px;border-radius:12px;background:var(--glass);border:1px solid var(--line)}
+.att .ic{flex:none;width:28px;height:28px;border-radius:9px;display:grid;place-items:center;font-size:13px;font-weight:700}
+.att .ic.w{background:rgba(240,179,90,.16);color:var(--warn)}
+.att .ic.r{background:rgba(255,138,122,.14);color:var(--neg)}
+.att .ic.g{background:var(--acc-t);color:var(--acc-text)}
+.att b{font-weight:600}.att p{margin:2px 0 0;color:var(--muted);font-size:12.5px}
+
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;font:600 11px "JetBrains Mono",monospace;letter-spacing:.02em;text-transform:lowercase;color:var(--muted);padding:8px 10px;border-bottom:1px solid var(--border);cursor:pointer;white-space:nowrap}
+th:hover{color:var(--text)}
+td{padding:9px 10px;border-bottom:1px solid var(--line)}
+tbody tr:nth-child(even) td{background:var(--zebra)}
+tbody tr{transition:background .2s}
+tbody tr:hover td{background:var(--acc-t)}
+.r{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.co{color:var(--text);text-decoration:none;border-bottom:1px dashed var(--border)}
+.pill{display:inline-block;font-size:11.5px;font-weight:600;padding:2px 9px;border-radius:99px;background:var(--glass-2);border:1px solid var(--line);white-space:nowrap}
+.pill.act{background:var(--acc-t);color:var(--acc-text);border-color:transparent}
+.pill.won{background:rgba(155,225,93,.14);color:var(--pos);border-color:transparent}
+.pill.late{background:rgba(255,138,122,.13);color:var(--neg);border-color:transparent}
+tr.new td:first-child{box-shadow:inset 3px 0 0 var(--acc)}
+.newtag{font:600 10px "JetBrains Mono",monospace;color:var(--acc-text);margin-left:6px}
+
+/* раскрытие плитки: стеклянная карточка выезжает в центр, фон размывается */
+.scrim{position:fixed;inset:0;z-index:50;background:rgba(8,10,9,.35);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);opacity:0;pointer-events:none;transition:opacity .35s}
+html[data-mode="light"] .scrim{background:rgba(220,224,219,.35)}
+.scrim.on{opacity:1;pointer-events:auto}
+.big{position:fixed;z-index:51;padding:24px 26px;overflow:hidden;transition:left .55s cubic-bezier(.16,1,.3,1),top .55s cubic-bezier(.16,1,.3,1),width .55s cubic-bezier(.16,1,.3,1),height .55s cubic-bezier(.16,1,.3,1),opacity .3s}
+.big .in{opacity:0;transition:opacity .3s .25s}
+.big.open .in{opacity:1}
+.big h3{margin:0 0 4px;font-size:20px;font-weight:600}
+.big .x{position:absolute;right:16px;top:14px;border:0;background:var(--glass-2);color:var(--text);width:32px;height:32px;border-radius:99px;cursor:pointer;font-size:16px}
+.chart{width:100%;height:220px;margin-top:14px}
+.chart .gl{stroke:var(--line)}
+.chart .a{fill:none;stroke:var(--acc);stroke-width:2.5}
+.chart .f{fill:url(#cg)}
+.chart text{fill:var(--muted);font:11px "JetBrains Mono",monospace}
+
+/* панель согласования */
+.note{position:fixed;right:16px;bottom:16px;z-index:60;width:320px;padding:14px 16px;font-size:12.5px}
+.note b{display:block;font-size:13.5px;margin-bottom:6px}
+.note ul{margin:6px 0 0;padding-left:18px;color:var(--muted)}
+.note li{margin:3px 0}
+.note .seg{margin-top:10px}
+
+@media (max-width:1100px){.kpis{grid-template-columns:1fr 1fr}.grid2{grid-template-columns:1fr}}
+@media (max-width:820px){.app{grid-template-columns:1fr;padding:12px}nav{position:static;height:auto}.foot{display:none}.note{position:static;width:auto;margin:0 12px 12px}.search{display:none}}
+@media (prefers-reduced-motion:reduce){.bg i,.dot{animation:none}}
+</style>
+</head>
+<body>
+<div class="bg" aria-hidden="true"><i></i><i></i><i></i>
+  <svg viewBox="0 0 1440 900" preserveAspectRatio="none">
+    <path d="M980 -20 C 900 200, 1120 360, 1010 560 S 940 840, 1060 940"/>
+    <path d="M1000 -20 C 920 210, 1140 370, 1030 570 S 960 850, 1080 940"/>
+    <path d="M1020 -20 C 940 220, 1160 380, 1050 580 S 980 860, 1100 940"/>
+  </svg>
+</div>
+
+<div class="app">
+  <nav class="glass">
+    <div class="brand">
+      <svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="22" fill="none" stroke="currentColor" stroke-opacity=".18" stroke-width="5"/>
+        <circle cx="32" cy="32" r="22" fill="none" stroke="var(--acc)" stroke-width="5" stroke-dasharray="104 35" stroke-linecap="round" transform="rotate(-90 32 32)"/>
+        <circle cx="32" cy="32" r="6" fill="var(--acc)"/></svg>
+      <div><b>Пульт 360</b><span>ГК Нейс</span></div>
+    </div>
+    <div class="menu">
+      <a class="on"><span class="d"></span>Сегодня</a>
+      <a><span class="d"></span>Продажи<span class="n">3</span></a>
+      <a><span class="d"></span>Сервис<span class="n">12</span></a>
+      <a><span class="d"></span>Финансы</a>
+      <a><span class="d"></span>Маркетинг</a>
+      <a class="off"><span class="d"></span>Логистика</a>
+      <a class="off"><span class="d"></span>Производство</a>
+      <a><span class="d"></span>Настройки</a>
+    </div>
+    <div class="foot">
+      <div class="seg" id="mode"><button data-m="dark" class="on">Тёмная</button><button data-m="light">Светлая</button></div>
+      <button class="btn">⚙ Мой экран</button>
+      <div class="who">Бурцев Д. · администратор</div>
+    </div>
+  </nav>
+
+  <main>
+    <div class="top glass">
+      <h1>Сегодня</h1>
+      <div class="sp"></div>
+      <div class="per"><button>‹</button><button class="on">Октябрь</button><button>Квартал</button><button>Год</button><button>›</button></div>
+      <div class="search">⌕ Клиент, сделка, VIN… <kbd>Ctrl K</kbd></div>
+    </div>
+
+    <div class="hello">
+      <div><span class="mono" style="color:var(--muted)">суббота, 3 октября</span><h2>Добрый день, Денис</h2></div>
+      <span class="badge mono"><span class="dot"></span>все источники в порядке</span>
+    </div>
+
+    <section class="kpis">
+      <div class="kpi glass hero" data-k="0">
+        <span class="mono l">выиграно · октябрь</span>
+        <div class="row"><div class="v">48,6<small>млн ₽</small></div><svg class="spark" viewBox="0 0 96 34"><path class="f" d="M0 30 L12 26 L24 27 L36 20 L48 22 L60 14 L72 15 L84 8 L96 5 L96 34 L0 34Z"/><path class="a" d="M0 30 L12 26 L24 27 L36 20 L48 22 L60 14 L72 15 L84 8 L96 5"/></svg></div>
+        <div class="bar"><i style="width:62%"></i></div>
+        <div class="s"><span class="up">▲ 12%</span> к сентябрю · 62% плана квартала</div>
+      </div>
+      <div class="kpi glass" data-k="1">
+        <span class="mono l">отгружено тс</span>
+        <div class="row"><div class="v">14<small>шт</small></div><svg class="spark" viewBox="0 0 96 34"><path class="f" d="M0 22 L12 24 L24 18 L36 21 L48 15 L60 17 L72 12 L84 14 L96 9 L96 34 L0 34Z"/><path class="a" d="M0 22 L12 24 L24 18 L36 21 L48 15 L60 17 L72 12 L84 14 L96 9"/></svg></div>
+        <div class="s"><span class="up">▲ 3</span> к прошлому месяцу</div>
+      </div>
+      <div class="kpi glass" data-k="2">
+        <span class="mono l">закрыто зн · сумма</span>
+        <div class="row"><div class="v">7,9<small>млн ₽</small></div><svg class="spark" viewBox="0 0 96 34"><path class="f" d="M0 12 L12 15 L24 13 L36 18 L48 16 L60 21 L72 19 L84 23 L96 22 L96 34 L0 34Z"/><path class="a" d="M0 12 L12 15 L24 13 L36 18 L48 16 L60 21 L72 19 L84 23 L96 22"/></svg></div>
+        <div class="s"><span class="down">▼ 4%</span> 212 заказ-нарядов</div>
+      </div>
+      <div class="kpi glass" data-k="3">
+        <span class="mono l">поступило</span>
+        <div class="row"><div class="v">31,2<small>млн ₽</small></div><svg class="spark" viewBox="0 0 96 34"><path class="f" d="M0 26 L12 20 L24 23 L36 16 L48 19 L60 12 L72 16 L84 10 L96 12 L96 34 L0 34Z"/><path class="a" d="M0 26 L12 20 L24 23 L36 16 L48 19 L60 12 L72 16 L84 10 L96 12"/></svg></div>
+        <div class="s">ожидается ещё <b style="color:var(--text)">&nbsp;6,4 млн</b></div>
+      </div>
+    </section>
+
+    <section class="grid2">
+      <div class="panel glass">
+        <div class="ph"><h3>Требует внимания</h3><span class="mono">4 пункта</span></div>
+        <ul class="att">
+          <li><span class="ic w">!</span><div><b>Срез ждёт подтверждения</b><p>2 спорные сделки — решить до формирования отчёта</p></div></li>
+          <li><span class="ic r">₽</span><div><b>Просрочка оплат — 3 клиента</b><p>1,8 млн ₽, самая старая — 17 дней</p></div></li>
+          <li><span class="ic w">⏱</span><div><b>Сделки без движения 14+ дней</b><p>5 сделок в работе, 22,4 млн ₽</p></div></li>
+          <li><span class="ic g">✓</span><div><b>Отгрузка под заявку готова</b><p>SITRAK C7H 6×4 — Агро-Лидер</p></div></li>
+        </ul>
+      </div>
+      <div class="panel glass">
+        <div class="ph"><h3>Воронка · крупные сделки</h3><span class="mono">условные данные</span></div>
+        <table>
+          <thead><tr><th>клиент</th><th>сделка</th><th>стадия</th><th class="r">сумма ↓</th></tr></thead>
+          <tbody>
+            <tr class="new"><td><a class="co">Т-Транс</a><span class="newtag">новое</span></td><td>Тягачи 4 шт.</td><td><span class="pill act">подписать договор</span></td><td class="r">49 800 000</td></tr>
+            <tr><td><a class="co">Агро-Лидер</a></td><td>Зерновоз C7H</td><td><span class="pill won">выиграна</span></td><td class="r">14 500 000</td></tr>
+            <tr><td><a class="co">КСМ-14</a></td><td>Самосвал 6×4</td><td><span class="pill">подготовить КП</span></td><td class="r">12 450 000</td></tr>
+            <tr><td><a class="co">СтройТех</a></td><td>Тягач C7H</td><td><span class="pill late">просрочено</span></td><td class="r">10 100 000</td></tr>
+            <tr><td><a class="co">Инжавинский</a></td><td>HOWO T5G</td><td><span class="pill act">отгрузить ТС</span></td><td class="r">9 800 000</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="scrim" id="scrim"></div>
+<div class="big glass" id="big" hidden>
+  <button class="x" id="x" aria-label="Закрыть">×</button>
+  <div class="in">
+    <span class="mono" style="color:var(--muted)" id="bl"></span>
+    <h3 id="bt"></h3>
+    <span style="color:var(--muted)">Динамика за 12 месяцев · условные данные</span>
+    <svg class="chart" viewBox="0 0 600 220" preserveAspectRatio="none">
+      <defs><linearGradient id="cg" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#c6f24e" stop-opacity=".35"/><stop offset="1" stop-color="#c6f24e" stop-opacity="0"/></linearGradient></defs>
+      <line class="gl" x1="0" x2="600" y1="50" y2="50"/><line class="gl" x1="0" x2="600" y1="110" y2="110"/><line class="gl" x1="0" x2="600" y1="170" y2="170"/>
+      <path class="f" d="M0 170 L55 150 L110 160 L165 120 L220 130 L275 96 L330 110 L385 80 L440 88 L495 60 L550 70 L600 40 L600 220 L0 220Z"/>
+      <path class="a" d="M0 170 L55 150 L110 160 L165 120 L220 130 L275 96 L330 110 L385 80 L440 88 L495 60 L550 70 L600 40"/>
+    </svg>
+  </div>
+</div>
+
+<svg width="0" height="0" style="position:absolute"><defs><linearGradient id="sg" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#c6f24e" stop-opacity=".35"/><stop offset="1" stop-color="#c6f24e" stop-opacity="0"/></linearGradient></defs></svg>
+
+<div class="note glass">
+  <b>Прототип темы «Графит» — на согласование</b>
+  Серо-графитовая основа, лаймовый акцент, все плитки и меню — стекло поверх мягкого живого фона.
+  <ul>
+    <li>нажмите на плитку — раскрытие стеклянной карточкой в центр;</li>
+    <li>наведите на плитку — блик за курсором;</li>
+    <li>внизу меню — тёмная / светлая.</li>
+  </ul>
+  <div class="seg" id="bgm"><button class="on" data-b="1">Фон живой</button><button data-b="0">Фон спокойный</button></div>
+</div>
+
+<script>
+(function () {
+  var root = document.documentElement;
+  document.querySelectorAll("#mode button").forEach(function (b) {
+    b.onclick = function () {
+      root.dataset.mode = b.dataset.m;
+      document.querySelectorAll("#mode button").forEach(function (x) { x.classList.toggle("on", x === b); });
+    };
+  });
+  document.querySelectorAll("#bgm button").forEach(function (b) {
+    b.onclick = function () {
+      document.body.classList.toggle("still", b.dataset.b === "0");
+      document.querySelectorAll("#bgm button").forEach(function (x) { x.classList.toggle("on", x === b); });
+    };
+  });
+  // блик за курсором
+  document.querySelectorAll(".kpi").forEach(function (k) {
+    k.addEventListener("pointermove", function (e) {
+      var r = k.getBoundingClientRect();
+      k.style.setProperty("--mx", e.clientX - r.left + "px"); k.style.setProperty("--my", e.clientY - r.top + "px");
+    });
+  });
+  // раскрытие: карточка растёт из прямоугольника плитки в центр (настоящие ширина/высота, без масштаба текста)
+  var big = document.getElementById("big"), scrim = document.getElementById("scrim"), src = null;
+  function place(r) { big.style.left = r.left + "px"; big.style.top = r.top + "px"; big.style.width = r.width + "px"; big.style.height = r.height + "px"; }
+  document.querySelectorAll(".kpi").forEach(function (k) {
+    k.onclick = function () {
+      src = k;
+      document.getElementById("bl").textContent = k.querySelector(".l").textContent;
+      document.getElementById("bt").textContent = k.querySelector(".v").textContent.replace(/(млн ₽|шт)/, " $1");
+      big.classList.toggle("hero-big", k.classList.contains("hero"));
+      big.hidden = false; big.style.transition = "none"; place(k.getBoundingClientRect()); k.style.opacity = 0;
+      big.offsetWidth; big.style.transition = "";
+      var w = Math.min(760, innerWidth - 32), h = 380;
+      place({ left: (innerWidth - w) / 2, top: (innerHeight - h) / 2, width: w, height: h });
+      big.classList.add("open"); scrim.classList.add("on");
+    };
+  });
+  function close() {
+    if (!src) return;
+    big.classList.remove("open"); scrim.classList.remove("on");
+    place(src.getBoundingClientRect());
+    var s = src; src = null;
+    setTimeout(function () { big.hidden = true; s.style.opacity = ""; }, 520);
+  }
+  scrim.onclick = close; document.getElementById("x").onclick = close;
+  addEventListener("keydown", function (e) { if (e.key === "Escape") close(); });
+})();
+</script>
+</body>
+</html>

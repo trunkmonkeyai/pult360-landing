@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Заставка Пульт 360 — прототип</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@1,500&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+:root{--bg:#070b08;--sur:#0c120e;--glass:rgba(14,21,16,.62);--line:rgba(220,255,200,.08);--line2:rgba(220,255,200,.14);
+  --text:#e9f0e6;--muted:#93a096;--lime:#c6f24e;--ink:#0a0f0b;--warn:#e8a25a}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font-family:Onest,system-ui,sans-serif;-webkit-font-smoothing:antialiased;overflow:hidden}
+canvas#bg{position:fixed;inset:0;width:100%;height:100%;display:block}
+.mono{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12px;letter-spacing:.02em;text-transform:lowercase}
+.muted{color:var(--muted)}
+.glass{background:linear-gradient(180deg,rgba(18,26,20,.62),rgba(10,15,11,.72));border:1px solid var(--line2);border-radius:16px;
+  -webkit-backdrop-filter:blur(16px) saturate(135%);backdrop-filter:blur(16px) saturate(135%);box-shadow:inset 0 1px 0 rgba(220,255,200,.05)}
+.dot{width:7px;height:7px;border-radius:9px;background:var(--lime);display:inline-block;box-shadow:0 0 10px rgba(198,242,78,.7)}
+
+/* шапка-цель: сюда «садится» кольцо */
+.top{position:fixed;left:24px;right:24px;top:18px;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;
+  border-radius:999px;border:1px solid transparent;z-index:5;transition:background .5s,border-color .5s}
+.top.on{background:rgba(9,14,10,.62);border-color:var(--line2);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px)}
+.brand{display:flex;align-items:center;gap:11px;font-weight:600;font-size:18px;letter-spacing:-.01em}
+.brand small{font-weight:400;font-size:13px;color:var(--muted);margin-left:6px}
+#slot{width:30px;height:30px;display:inline-block}
+.top .right{display:flex;gap:10px;align-items:center;opacity:0;transition:opacity .6s .2s}
+.top.on .right{opacity:1}
+.badge{display:inline-flex;align-items:center;gap:8px;padding:5px 11px;border-radius:999px;border:1px solid var(--line2);background:rgba(12,18,14,.6);color:var(--muted)}
+
+/* кольцо */
+#ring{position:fixed;width:150px;height:150px;z-index:6;will-change:transform;pointer-events:none}
+#ring svg{width:100%;height:100%;overflow:visible}
+#pct{position:fixed;z-index:6;text-align:center;width:240px;pointer-events:none}
+#pct b{display:block;font-size:30px;font-weight:600;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+#msg{display:block;margin-top:6px;min-height:16px}
+
+/* таблицы источников */
+.src{position:fixed;width:250px;padding:12px 12px 10px;z-index:4;transition:opacity .6s,transform .8s cubic-bezier(.16,1,.3,1),border-color .4s}
+.src h4{margin:0 0 8px;display:flex;justify-content:space-between;align-items:center;font-size:13.5px;font-weight:600}
+.src h4 .st{font-family:"JetBrains Mono",monospace;font-size:11px;font-weight:400;color:var(--muted)}
+.src.done{border-color:rgba(198,242,78,.45)}
+.src.done h4 .st{color:var(--lime)}
+.src table{width:100%;border-collapse:collapse;font-size:11.5px}
+.src td{padding:3px 4px;border-top:1px solid var(--line);white-space:nowrap;color:#cfd8cc}
+.src td.r{text-align:right;font-variant-numeric:tabular-nums}
+.src tr.read td{background:rgba(198,242,78,.08);color:var(--text)}
+.src tr.sent td{color:var(--muted)}
+
+svg#beams{position:fixed;inset:0;width:100%;height:100%;z-index:3;pointer-events:none}
+.chip{position:fixed;z-index:4;pointer-events:none;padding:3px 8px;border-radius:999px;font-family:"JetBrains Mono",monospace;font-size:11px;
+  background:rgba(198,242,78,.14);border:1px solid rgba(198,242,78,.5);color:var(--text);white-space:nowrap;box-shadow:0 0 14px rgba(198,242,78,.35)}
+.pk{position:fixed;width:7px;height:7px;margin:-3.5px 0 0 -3.5px;border-radius:9px;background:var(--lime);box-shadow:0 0 12px 2px rgba(198,242,78,.65);z-index:4;pointer-events:none}
+
+/* после загрузки — «экран приложения» (силуэт) */
+#app{position:fixed;inset:96px 24px 24px;z-index:2;display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:110px;gap:14px;opacity:0;
+  transform:translateY(16px) scale(.99);filter:blur(10px);transition:opacity .8s,transform .8s cubic-bezier(.16,1,.3,1),filter .7s}
+#app.on{opacity:1;transform:none;filter:none}
+#app .glass{padding:14px}
+#app .k{font-size:26px;font-weight:600;letter-spacing:-.02em;margin-top:6px;font-variant-numeric:tabular-nums}
+#app .wide{grid-column:span 2;grid-row:span 2}
+#app h2{grid-column:1/-1;margin:0;font-size:34px;letter-spacing:-.03em;font-weight:600;align-self:end}
+#app h2 em{font-family:"Cormorant Garamond",serif;font-weight:500;font-size:1.1em}
+
+/* вход */
+#login{position:fixed;z-index:7;width:340px;padding:20px;display:none}
+#login.on{display:block}
+#login h3{margin:0 0 4px;font-size:20px;letter-spacing:-.01em}
+#login input{width:100%;margin-top:10px;padding:11px 13px;border-radius:10px;border:1px solid var(--line2);background:rgba(7,11,8,.6);color:var(--text);font:inherit;font-size:14px}
+#login input:focus{outline:2px solid var(--lime);outline-offset:1px}
+#login button{margin-top:14px;width:100%;height:46px;border:0;border-radius:999px;background:var(--lime);color:var(--ink);font:600 15px Onest,sans-serif;cursor:pointer}
+
+/* пульт прототипа */
+.ctl{position:fixed;right:20px;bottom:20px;z-index:20;display:flex;gap:6px;align-items:center;padding:6px;border-radius:999px;background:rgba(9,14,10,.8);border:1px solid var(--line2)}
+.ctl button{border:0;background:transparent;color:var(--muted);font:500 13px Onest,sans-serif;padding:7px 12px;border-radius:999px;cursor:pointer}
+.ctl button.on{background:var(--lime);color:var(--ink)}
+.ctl label{color:var(--muted);font-size:13px;padding:0 8px;display:flex;gap:6px;align-items:center}
+.vname{position:fixed;left:24px;bottom:22px;z-index:20;max-width:520px}
+.vname b{font-size:15px}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<canvas id="bg" aria-hidden="true"></canvas>
+<header class="top" id="top">
+  <div class="brand"><span id="slot"></span> Пульт 360 <small>ГК Нейс</small></div>
+  <div class="right"><span class="badge mono"><span class="dot"></span> всё работает</span></div>
+</header>
+<svg id="beams" aria-hidden="true"></svg>
+<div id="ring" aria-hidden="true">
+  <svg viewBox="0 0 100 100">
+    <circle cx="50" cy="50" r="44" fill="none" stroke="rgba(220,255,200,.14)" stroke-width="7"/>
+    <circle id="arc" cx="50" cy="50" r="44" fill="none" stroke="#c6f24e" stroke-width="7" stroke-linecap="round"
+      transform="rotate(-90 50 50)" stroke-dasharray="0 277" style="filter:drop-shadow(0 0 10px rgba(198,242,78,.5))"/>
+    <circle id="core" cx="50" cy="50" r="11" fill="#c6f24e"/>
+  </svg>
+</div>
+<div id="pct"><b>0%</b><span class="mono muted" id="msg">подключаюсь к данным…</span></div>
+<form id="login" class="glass" autocomplete="off" onsubmit="event.preventDefault();startLoad()">
+  <h3>Вход в Пульт 360</h3><div class="mono muted">данные собраны 4 мин назад</div>
+  <input id="u" placeholder="Логин" aria-label="Логин"><input id="p" type="password" placeholder="Пароль" aria-label="Пароль">
+  <button type="submit">Войти</button>
+</form>
+<div id="app" aria-hidden="true">
+  <h2>Доброе утро, <em>Денис</em></h2>
+  <div class="glass"><div class="mono muted">сделки в работе</div><div class="k">413,4 млн ₽</div></div>
+  <div class="glass"><div class="mono muted">план квартала</div><div class="k">58%</div></div>
+  <div class="glass"><div class="mono muted">поступило · октябрь</div><div class="k">48,5 млн ₽</div></div>
+  <div class="glass"><div class="mono muted">закрыто зн</div><div class="k">37</div></div>
+  <div class="glass wide"><div class="mono muted">требует внимания</div><div style="margin-top:10px;display:grid;gap:8px;font-size:14px">
+    <span><span class="dot" style="background:var(--warn)"></span> 3 клиента просрочили оплату</span>
+    <span><span class="dot" style="background:var(--warn)"></span> 2 машины в ремонте дольше срока</span>
+    <span><span class="dot"></span> Новый срез ждёт подтверждения</span></div></div>
+  <div class="glass wide"><div class="mono muted">новое за два дня</div></div>
+</div>
+
+<div class="vname" id="vname"></div>
+<div class="ctl" role="group" aria-label="Прототип">
+  <button data-v="A" class="on">A · Схема потоков</button><button data-v="B">B · Орбита</button><button data-v="C">C · Водопад данных</button>
+  <label><input type="checkbox" id="withLogin"> с формой входа</label>
+  <button id="replay">↻ Ещё раз</button>
+</div>
+
+<script>
+/* ═══ фон: лента-«водопад» (тот же шейдер, что на лендинге; прокрутку заменяет время) ═══ */
+(function(){
+  var cv=document.getElementById('bg'),gl=cv.getContext('webgl');if(!gl)return;
+  var vs='attribute vec2 p;varying vec2 u;void main(){u=p*.5+.5;gl_Position=vec4(p,0.,1.);}';
+  var fs='precision highp float;uniform float t;uniform float sc;uniform vec2 r;uniform vec2 m;uniform float fo;varying vec2 u;'+
+  'float h(vec2 p){return fract(sin(dot(p,vec2(12.9898,78.233)))*43758.5453);}'+
+  'float n(vec2 p){vec2 i=floor(p),f=fract(p);vec2 w=f*f*(3.-2.*f);return mix(mix(h(i),h(i+vec2(1,0)),w.x),mix(h(i+vec2(0,1)),h(i+vec2(1,1)),w.x),w.y);}'+
+  'float fb(vec2 p){float v=0.,a=.5;for(int i=0;i<4;i++){v+=a*n(p);p=p*2.03+vec2(1.7,9.2);a*=.5;}return v;}'+
+  'void main(){float as=r.x/r.y;vec2 p=vec2((u.x-.5)*as,u.y-.5);vec3 bg=vec3(.027,.043,.031),li=vec3(.776,.949,.306),de=vec3(.16,.40,.21);'+
+  'vec2 q=p*vec2(1.1,1.6)+vec2(0.,sc*.35);float nn=fb(q*1.4+vec2(t*.025,-t*.018));float bd=smoothstep(.22,.78,nn)*(.55+.45*sin(q.x*1.3+t*.07+nn*3.));'+
+  'vec3 col=bg+mix(de,li,.28)*bd*.26;'+
+  'float Y=sc-p.y;float a1=Y*1.15+.55,a2=Y*2.7+1.3;float X=as*(.30*sin(a1)+.07*sin(a2));float dX=as*(.30*1.15*cos(a1)+.07*2.7*cos(a2));'+
+  'float nr=exp(-pow((p.y-m.y)/.28,2.))*fo;X+=(m.x-X)*.28*nr;float sl=sqrt(1.+dX*dX);float wd=.05+.11*(.5+.5*sin(Y*1.6+2.));vec3 tn=vec3(0.);'+
+  'for(int i=0;i<30;i++){float fi=float(i)/30.;float a=fi*6.2832+Y*3.1-t*.55;float xi=X+wd*sin(a)*(.8+.2*sin(fi*17.));float dp=.5+.5*cos(a);'+
+  'float d=abs(p.x-xi)/sl;float g=.0026/(d+.0026*.55);float pk=pow(.5+.5*sin(Y*5.-t*1.9+fi*9.),8.);tn+=mix(de,li,.3+.7*dp)*g*(.22+.78*dp)*(.55+.45*pk);}'+
+  'float dc=abs(p.x-X)/sl;col+=tn*.17+li*exp(-dc*dc/.02)*.07;'+
+  'float vg=1.-smoothstep(.2,1.25,length(p*vec2(.75,1.15)));col=mix(bg,col,.4+.6*vg);col+=(h(u*r+fract(t))-.5)*.016;gl_FragColor=vec4(col,1.);}';
+  function sh(k,s){var o=gl.createShader(k);gl.shaderSource(o,s);gl.compileShader(o);return o;}
+  var pr=gl.createProgram();gl.attachShader(pr,sh(gl.VERTEX_SHADER,vs));gl.attachShader(pr,sh(gl.FRAGMENT_SHADER,fs));gl.linkProgram(pr);gl.useProgram(pr);
+  var b=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,b);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),gl.STATIC_DRAW);
+  var lp=gl.getAttribLocation(pr,'p');gl.enableVertexAttribArray(lp);gl.vertexAttribPointer(lp,2,gl.FLOAT,false,0,0);
+  var U=function(x){return gl.getUniformLocation(pr,x)},ut=U('t'),us=U('sc'),ur=U('r'),um=U('m'),uf=U('fo');
+  var tg=[0,0],mo=[0,0],tf=0,f=0,t0=performance.now(),last=t0;
+  addEventListener('pointermove',function(e){tg=[(e.clientX/innerWidth-.5)*innerWidth/innerHeight,.5-e.clientY/innerHeight];tf=1;});
+  document.documentElement.addEventListener('pointerleave',function(){tf=0;});
+  function fr(nw){var dt=Math.min(.1,(nw-last)/1000);last=nw;var dpr=Math.min(devicePixelRatio,1.25),w=Math.round(innerWidth*dpr),hh=Math.round(innerHeight*dpr);
+    if(cv.width!==w||cv.height!==hh){cv.width=w;cv.height=hh;gl.viewport(0,0,w,hh);}
+    var k=Math.min(1,dt*1.6);mo[0]+=(tg[0]-mo[0])*k;mo[1]+=(tg[1]-mo[1])*k;f+=(tf-f)*Math.min(1,dt*1.2);var s=(nw-t0)/1000;
+    gl.uniform1f(ut,s);gl.uniform1f(us,s*.09+window.__flow);gl.uniform2f(ur,w,hh);gl.uniform2f(um,mo[0],mo[1]);gl.uniform1f(uf,f);
+    gl.drawArrays(gl.TRIANGLES,0,3);requestAnimationFrame(fr);}
+  window.__flow=0;requestAnimationFrame(fr);
+})();
+
+/* ═══ общие детали ═══ */
+var SRC=[
+  {id:'bx', name:'Битрикс24', what:'сделки', rows:[['Сделка 5026','Утвердить КП','13,0 млн'],['Сделка 5013','Договор','12,0 млн'],['Сделка 5056','Успешна','10,0 млн'],['Сделка 5041','Диагностика','—']], chip:'87 сделок'},
+  {id:'alfa', name:'1С Альфа-Авто', what:'отгрузки', rows:[['SITRAK C7H','Клиент А','4,6 млн'],['HOWO T5G','Клиент Б','10,1 млн'],['SITRAK C7H','Клиент В','14,2 млн'],['HOWO T5G','Клиент Г','9,8 млн']], chip:'1 116 поз.'},
+  {id:'svc', name:'1С Сервис', what:'заказ-наряды', rows:[['ЗН 4471','в работе','312 т'],['ЗН 4468','закрыт','188 т'],['ЗН 4466','ждёт з/ч','96 т'],['ЗН 4463','закрыт','240 т']], chip:'37 ЗН'},
+  {id:'pay', name:'1С Оплаты', what:'выписки', rows:[['п/п 1184','Клиент А','1,8 млн'],['п/п 1179','Клиент Б','0,9 млн'],['п/п 1190','Клиент В','2,6 млн'],['п/п 1191','Клиент Д','0,4 млн']], chip:'48,5 млн ₽'},
+  {id:'uat', name:'1С:УАТ', what:'рейсы', rows:[['Рейс 418','Москва → Казань','+5 ч'],['Рейс 421','Тула → Москва','в пути'],['Рейс 415','Москва → Тверь','сдан'],['Рейс 412','Калуга → Москва','сдан']], chip:'14 рейсов'},
+  {id:'erp', name:'1С:ERP Армадон', what:'выпуск', rows:[['Цех 1','полуприцепы','6 ед.'],['Цех 2','кузова','4 ед.'],['Цех 1','рамы','8 ед.'],['Цех 3','окраска','5 ед.']], chip:'168 ед.'},
+];
+var MSG=['подключаюсь к данным…','битрикс24 — сделки и лиды','1с альфа-авто — отгрузки','1с — заказ-наряды сервиса','1с — оплаты и выписки','1с:уат — рейсы','1с:erp — выпуск','собираю картину…'];
+var L=2*Math.PI*44, ring=document.getElementById('ring'), arc=document.getElementById('arc'), pctEl=document.querySelector('#pct b'), msg=document.getElementById('msg'),
+    pctBox=document.getElementById('pct'), beams=document.getElementById('beams'), hdr=document.getElementById('top'), app=document.getElementById('app'),
+    login=document.getElementById('login'), still=matchMedia('(prefers-reduced-motion: reduce)').matches;
+var V='A', run=0, progress=0, nodes=[];
+var ease=function(x){return x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2};
+function setProgress(p){progress=Math.max(progress,p);arc.setAttribute('stroke-dasharray',(progress*L*.75)+' '+L);pctEl.textContent=Math.round(progress*100)+'%';}
+function placeRing(cx,cy,size){ring.style.width=ring.style.height=size+'px';ring.style.left=(cx-size/2)+'px';ring.style.top=(cy-size/2)+'px';ring.style.transform='none';
+  pctBox.style.left=(cx-120)+'px';pctBox.style.top=(cy+size/2+14)+'px';}
+function ringCenter(){var r=ring.getBoundingClientRect();return [r.left+r.width/2,r.top+r.height/2];}
+function el(html){var d=document.createElement('div');d.innerHTML=html.trim();return d.firstChild;}
+function table(s,n){var rows=s.rows.slice(0,n||4);return '<div class="src glass" data-id="'+s.id+'"><h4><span>'+s.name+' <span class="mono muted">· '+s.what+'</span></span><span class="st">чтение…</span></h4><table>'+
+  rows.map(function(r){return '<tr><td>'+r[0]+'</td><td>'+r[1]+'</td><td class="r">'+r[2]+'</td></tr>'}).join('')+'</table></div>';}
+function sleep(ms,my){return new Promise(function(res,rej){setTimeout(function(){my===run?res():rej('stop')},still?0:ms);});}
+function tween(ms,fn,my){return new Promise(function(res,rej){var t0=performance.now();(function f(){if(my!==run)return rej('stop');var k=still?1:Math.min(1,(performance.now()-t0)/ms);fn(k);k<1?requestAnimationFrame(f):res();})();});}
+// путь-кривая между двумя точками (кубическая Безье) и бегущий по нему «пакет» или чип
+function curve(a,b,bend){var mx=(a[0]+b[0])/2,my=(a[1]+b[1])/2;var dx=b[0]-a[0],dy=b[1]-a[1];
+  return 'M'+a[0]+' '+a[1]+' C'+(a[0]+dx*.45)+' '+(a[1]+dy*.05+(bend||0))+' '+(b[0]-dx*.45)+' '+(b[1]-dy*.05-(bend||0))+' '+b[0]+' '+b[1];}
+function beam(d){var g=document.createElementNS('http://www.w3.org/2000/svg','path');g.setAttribute('d',d);g.setAttribute('fill','none');g.setAttribute('stroke','rgba(220,255,200,.14)');g.setAttribute('stroke-width','1');beams.appendChild(g);
+  var hl=g.cloneNode();hl.setAttribute('stroke','#c6f24e');hl.setAttribute('stroke-width','1.6');hl.setAttribute('stroke-linecap','round');var len=g.getTotalLength();
+  hl.setAttribute('stroke-dasharray','26 '+(len+30));hl.setAttribute('stroke-dashoffset',len+26);hl.style.opacity=0;beams.appendChild(hl);return {g:g,hl:hl,len:len};}
+function travel(b,ms,node,my){node.style.left='0px';node.style.top='0px';document.body.appendChild(node);nodes.push(node);var w=node.offsetWidth/2,h=node.offsetHeight/2;
+  return tween(ms,function(k){var e=ease(k),pt=b.g.getPointAtLength(e*b.len);node.style.transform='translate('+(pt.x-w)+'px,'+(pt.y-h)+'px)';node.style.opacity=k>.92?(1-k)*12:1;
+    b.hl.style.opacity=1;b.hl.setAttribute('stroke-dashoffset',(1-e)*(b.len+26));},my).then(function(){node.remove();b.hl.style.opacity=0;});}
+async function readRows(card,my){var trs=card.querySelectorAll('tr');for(var i=0;i<trs.length;i++){trs[i].className='read';await sleep(110,my);trs[i].className='sent';}}
+function done(card){card.classList.add('done');card.querySelector('.st').textContent='✓ получено';}
+
+function reset(){run++;progress=0;nodes.forEach(function(n){n.remove()});nodes=[];beams.innerHTML='';document.querySelectorAll('.src').forEach(function(n){n.remove()});
+  setProgress(0);progress=0;arc.setAttribute('stroke-dasharray','0 '+L);pctEl.textContent='0%';msg.textContent=MSG[0];pctBox.style.opacity=1;
+  hdr.classList.remove('on');app.classList.remove('on');ring.style.transition='none';ring.style.opacity=1;document.getElementById('core').style.opacity=1;login.classList.remove('on');
+  window.__flow=0;}
+
+/* ═══ финал (общий): кольцо улетает в знак в шапке, появляется приложение ═══ */
+async function finish(my){
+  msg.textContent='готово';await sleep(350,my);
+  pctBox.style.transition='opacity .3s';pctBox.style.opacity=0;
+  document.querySelectorAll('.src').forEach(function(c){c.style.opacity=0;c.style.transform+=' scale(.96)';});beams.style.transition='opacity .5s';beams.style.opacity=0;
+  var slot=document.getElementById('slot').getBoundingClientRect(),c=ringCenter(),size=ring.getBoundingClientRect().width;
+  var dx=slot.left+slot.width/2-c[0],dy=slot.top+slot.height/2-c[1],sc=slot.width/size;
+  await tween(900,function(k){var e=ease(k);ring.style.transform='translate('+dx*e+'px,'+dy*e+'px) scale('+(1+(sc-1)*e)+')';},my);
+  hdr.classList.add('on');await sleep(150,my);app.classList.add('on');beams.innerHTML='';beams.style.opacity=1;
+}
+async function startLoad(){login.classList.remove('on');var my=run;try{await (V==='A'?varA:V==='B'?varB:varC)(my);await finish(my);}catch(e){}}
+
+/* ═══ A · Схема потоков: таблицы слева, лучи с пакетами ведут к кольцу справа ═══ */
+async function varA(my){
+  var W=innerWidth,H=innerHeight;var cx=W*.66,cy=H*.5;placeRing(cx,cy,170);
+  var cards=SRC.map(function(s,i){var c=el(table(s,3));c.style.left=(W*.08)+'px';c.style.top=(110+i*((H-150)/SRC.length))+'px';c.style.width='280px';c.style.opacity=0;c.style.transform='translateX(-20px)';document.body.appendChild(c);return c;});
+  for(var i=0;i<cards.length;i++){cards[i].style.transitionDelay=(i*60)+'ms';cards[i].style.opacity=1;cards[i].style.transform='none';}
+  await sleep(700,my);
+  var bs=cards.map(function(c){var r=c.getBoundingClientRect();return beam(curve([r.right,r.top+r.height/2],[cx-85,cy],0));});
+  for(var i=0;i<cards.length;i++){(function(i){
+    setTimeout(async function(){if(my!==run)return;msg.textContent=MSG[i+1];try{await readRows(cards[i],my);
+      var chip=el('<span class="chip">'+SRC[i].chip+'</span>');await travel(bs[i],1100,chip,my);done(cards[i]);setProgress((i+1)/SRC.length);}catch(e){}},still?0:i*520);})(i);}
+  await sleep(SRC.length*520+1900,my);msg.textContent=MSG[7];await sleep(400,my);
+}
+
+/* ═══ B · Орбита: кольцо в центре, таблицы по эллипсу вокруг, чипы втягиваются в кольцо ═══ */
+async function varB(my){
+  var W=innerWidth,H=innerHeight;var cx=W*.5,cy=H*.52;placeRing(cx,cy,190);
+  var rx=Math.min(W*.36,520),ry=Math.min(H*.33,280);
+  var cards=SRC.map(function(s,i){var a=-Math.PI/2+i*(2*Math.PI/SRC.length);var c=el(table(s,3));var x=cx+Math.cos(a)*rx-125,y=cy+Math.sin(a)*ry-62;
+    c.style.left=x+'px';c.style.top=y+'px';c.style.opacity=0;c.style.transform='scale(.9)';c.dataset.a=a;document.body.appendChild(c);return c;});
+  cards.forEach(function(c,i){c.style.transitionDelay=(i*70)+'ms';c.style.opacity=1;c.style.transform='none';});
+  // лёгкое «парение» таблиц по орбите
+  var t0=performance.now();(function float(){if(my!==run)return;var t=(performance.now()-t0)/1000;cards.forEach(function(c,i){if(c.classList.contains('done'))return;
+    c.style.translate=(Math.sin(t*.6+i)*6)+'px '+(Math.cos(t*.5+i*1.3)*5)+'px';});requestAnimationFrame(float);})();
+  await sleep(800,my);
+  for(var i=0;i<cards.length;i++){(function(i){setTimeout(async function(){if(my!==run)return;msg.textContent=MSG[i+1];try{await readRows(cards[i],my);
+    var r=cards[i].getBoundingClientRect();var from=[r.left+r.width/2,r.top+r.height/2];var b=beam(curve(from,[cx,cy],i%2?-60:60));b.g.setAttribute('stroke','rgba(220,255,200,.06)');
+    for(var k=0;k<3;k++){(function(k){setTimeout(function(){if(my!==run)return;travel(b,900,el('<span class="pk"></span>'),my).catch(function(){})},k*140)})(k);}
+    await travel(b,1000,el('<span class="chip">'+SRC[i].chip+'</span>'),my);done(cards[i]);cards[i].style.opacity=.55;setProgress((i+1)/SRC.length);}catch(e){}},still?0:i*560);})(i);}
+  await sleep(SRC.length*560+1900,my);msg.textContent=MSG[7];await sleep(400,my);
+}
+
+/* ═══ C · Водопад данных: таблицы сверху, строки «стекают» вниз по ленте в кольцо ═══ */
+async function varC(my){
+  var W=innerWidth,H=innerHeight;var cx=W*.5,cy=H*.74;placeRing(cx,cy,150);
+  var cw=Math.min(210,(W-60)/SRC.length-12);
+  var cards=SRC.map(function(s,i){var c=el(table(s));c.style.width=cw+'px';c.style.left=(30+i*((W-60)/SRC.length)+((W-60)/SRC.length-cw)/2)+'px';c.style.top='96px';
+    c.style.opacity=0;c.style.transform='translateY(-14px)';c.querySelectorAll('td:nth-child(2)').forEach(function(td){td.style.display='none'});document.body.appendChild(c);return c;});
+  cards.forEach(function(c,i){c.style.transitionDelay=(i*60)+'ms';c.style.opacity=1;c.style.transform='none';});
+  await sleep(700,my);
+  // фон «течёт» быстрее, пока данные стекают
+  var f0=window.__flow;var flowing=true;(function fl(){if(!flowing||my!==run)return;window.__flow+=0.004;requestAnimationFrame(fl);})();
+  for(var i=0;i<cards.length;i++){(function(i){setTimeout(async function(){if(my!==run)return;msg.textContent=MSG[i+1];try{
+    var trs=cards[i].querySelectorAll('tr');var r=cards[i].getBoundingClientRect();
+    for(var k=0;k<trs.length;k++){trs[k].className='read';
+      var from=[r.left+r.width/2,r.bottom];var b=beam('M'+from[0]+' '+from[1]+' C'+from[0]+' '+(from[1]+(cy-from[1])*.55)+' '+cx+' '+(cy-(cy-from[1])*.45)+' '+cx+' '+(cy-80));
+      b.g.setAttribute('stroke','rgba(220,255,200,.05)');
+      var cells=trs[k].querySelectorAll('td');travel(b,1300,el('<span class="chip">'+cells[cells.length-1].textContent+'</span>'),my).catch(function(){});
+      await sleep(170,my);trs[k].className='sent';}
+    await sleep(1150,my);done(cards[i]);setProgress((i+1)/SRC.length);}catch(e){}},still?0:i*480);})(i);}
+  await sleep(SRC.length*480+2100,my);flowing=false;msg.textContent=MSG[7];await sleep(400,my);
+}
+
+var NAMES={A:['A · Схема потоков','Таблицы источников слева, от каждой — луч к кольцу. Строки подсвечиваются при чтении, итог источника («87 сделок») летит по лучу и доливает кольцо.'],
+  B:['B · Орбита','Кольцо в центре, таблицы парят вокруг по эллипсу. От каждой в кольцо втягиваются импульсы и итог; прочитанная таблица гаснет.'],
+  C:['C · Водопад данных','Таблицы — рядом сверху; каждая строка срывается вниз и стекает в кольцо внизу, лента на фоне течёт быстрее, пока идут данные.']};
+function go(){reset();var n=NAMES[V];document.getElementById('vname').innerHTML='<b>'+n[0]+'</b><div class="muted" style="font-size:13px;margin-top:4px">'+n[1]+'</div>';
+  if(document.getElementById('withLogin').checked){var W=innerWidth,H=innerHeight;placeRing(W*.5,H*.3,130);pctBox.style.opacity=0;login.classList.add('on');
+    login.style.left=(W*.5-170)+'px';login.style.top=(H*.3+90)+'px';document.getElementById('u').focus();return;}
+  startLoad();}
+document.querySelectorAll('[data-v]').forEach(function(b){b.onclick=function(){document.querySelectorAll('[data-v]').forEach(function(x){x.classList.toggle('on',x===b)});V=b.dataset.v;go();};});
+document.getElementById('replay').onclick=go;document.getElementById('withLogin').onchange=go;
+addEventListener('resize',function(){clearTimeout(window.__rz);window.__rz=setTimeout(go,300);});
+go();
+</script>
+</body>
+</html>
